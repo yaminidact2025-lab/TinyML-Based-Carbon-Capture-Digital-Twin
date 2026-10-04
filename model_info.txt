@@ -1,0 +1,21 @@
+TinyML Carbon Capture Model
+============================
+
+Input features:
+CO2
+Temperature
+Humidity
+AirQuality
+
+Output classes:
+0 = Low
+1 = Medium
+2 = High
+
+Test Accuracy: 99.00%
+
+Scaler Mean:
+[669.88862514  34.09072502  72.77901241   3.202525  ]
+
+Scaler Scale:
+[105.71918391   4.90202519  12.6099371    1.09054831]

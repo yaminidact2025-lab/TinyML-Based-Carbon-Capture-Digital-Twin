@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyML-Based Carbon Capture Digital Twin</title>
+
+    <link rel="stylesheet" href="./style.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+
+<header class="topbar">
+
+    <div class="brand">
+        <h1>TinyML-Based Carbon Capture Digital Twin</h1>
+        <p>Thermal Power Plant Monitoring System</p>
+    </div>
+
+    <nav class="main-nav">
+        <button class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
+        <button class="nav-btn" data-page="analytics"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+        <button class="nav-btn" data-page="alerts"><i class="fa-solid fa-bell"></i> Alerts</button>
+        <button class="nav-btn" data-page="model"><i class="fa-solid fa-brain"></i> Model</button>
+        <button class="nav-btn" data-page="control"><i class="fa-solid fa-sliders"></i> Control</button>
+    </nav>
+
+    <div class="header-right">
+        <div class="plant-online">
+            <span class="status-dot"></span>
+            Plant Online
+        </div>
+
+        <div class="header-time">
+            <div id="time">--:--:--</div>
+            <div id="date">-- --- ----</div>
+        </div>
+    </div>
+
+</header>
+
+
+<!-- ================= PAGE: DASHBOARD ================= -->
+
+<div id="page-dashboard" class="page active">
+
+<div class="dashboard">
+
+    <!-- LEFT PANEL -->
+
+    <aside class="left-panel">
+
+        <section class="panel-card">
+
+            <div class="panel-title">SENSOR DATA</div>
+
+            <div class="sensor-list">
+
+                <div class="sensor-row">
+                    <div class="sensor-icon blue"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="sensor-name">CO₂ Level</div>
+                    <div id="co2" class="sensor-value">-- ppm</div>
+                </div>
+
+                <div class="sensor-row">
+                    <div class="sensor-icon red"><i class="fa-solid fa-temperature-three-quarters"></i></div>
+                    <div class="sensor-name">Temperature</div>
+                    <div id="temp" class="sensor-value">-- °C</div>
+                </div>
+
+                <div class="sensor-row">
+                    <div class="sensor-icon cyan"><i class="fa-solid fa-droplet"></i></div>
+                    <div class="sensor-name">Humidity</div>
+                    <div id="humidity" class="sensor-value">-- %</div>
+                </div>
+
+                <div class="sensor-row">
+                    <div class="sensor-icon green"><i class="fa-solid fa-wind"></i></div>
+                    <div class="sensor-name">Air Quality</div>
+                    <div id="airQuality" class="sensor-value">-- AQI</div>
+                </div>
+
+                <div class="sensor-row">
+                    <div class="sensor-icon lime"><i class="fa-solid fa-fan"></i></div>
+                    <div class="sensor-name">Fan Speed</div>
+                    <div id="fan" class="sensor-value">-- %</div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="panel-card tinyml-panel">
+
+            <div class="panel-title">TINYML PREDICTION</div>
+
+            <div class="brain-icon"><i class="fa-solid fa-brain"></i></div>
+
+            <div id="prediction" class="prediction">WAITING</div>
+
+            <div class="confidence">
+                Confidence: <span id="confidence">-- %</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CAPTURE EFFICIENCY</div>
+
+            <div class="efficiency-row">
+                <div class="efficiency-bar">
+                    <div id="efficiencyBar" class="efficiency-fill"></div>
+                </div>
+                <span id="capture">-- %</span>
+            </div>
+
+            <div class="panel-title system-title">SYSTEM HEALTH</div>
+
+            <div id="health" class="system-health">● Waiting</div>
+
+        </section>
+
+    </aside>
+
+
+    <!-- CENTER - DIGITAL TWIN -->
+
+    <main class="center-panel">
+
+        <div id="threejs" class="three-container"></div>
+
+        <div class="twin-overlay">
+            <div class="twin-badge">DIGITAL TWIN • LIVE</div>
+            <div id="twinPrediction" class="twin-state">NORMAL</div>
+        </div>
+
+        <div class="twin-hint">Click a component for details</div>
+
+    </main>
+
+
+    <!-- RIGHT PANEL -->
+
+    <aside class="right-panel">
+
+        <section class="panel-card">
+
+            <div class="panel-title">CAMERA VIEW</div>
+
+            <button class="camera-btn active" onclick="setCameraView('plant')">Plant View</button>
+            <button class="camera-btn" onclick="setCameraView('capture')">Capture Unit View</button>
+            <button class="camera-btn" onclick="setCameraView('storage')">CO₂ Storage View</button>
+            <button class="camera-btn" onclick="setCameraView('top')">Top View</button>
+            <button class="camera-btn reset-btn" onclick="setCameraView('reset')">
+                <i class="fa-solid fa-rotate"></i> Reset Camera
+            </button>
+
+        </section>
+
+        <section class="panel-card recommendation-panel">
+
+            <div class="panel-title">AI RECOMMENDATION</div>
+
+            <div id="recommendation" class="recommendation-text">
+                Waiting for TinyML prediction...
+            </div>
+
+            <div id="alertBox" class="alert-box">
+                <i class="fa-solid fa-check"></i> NORMAL OPERATION
+            </div>
+
+        </section>
+
+    </aside>
+
+</div>
+
+
+<!-- BOTTOM SECTION -->
+
+<section class="bottom-grid">
+
+    <div class="bottom-card chart-card">
+        <div class="chart-title">CO₂ LEVEL (ppm)</div>
+        <canvas id="co2Chart"></canvas>
+    </div>
+
+    <div class="bottom-card chart-card">
+        <div class="chart-title">FAN SPEED (%)</div>
+        <canvas id="fanChart"></canvas>
+    </div>
+
+    <div class="bottom-card process-card">
+
+        <div class="chart-title">PROCESS STATUS</div>
+
+        <div class="process-row">
+            <span><span class="process-dot green-dot"></span> Flue Gas Flow</span>
+            <strong id="flueStatus">Running</strong>
+        </div>
+
+        <div class="process-row">
+            <span><span class="process-dot green-dot"></span> Absorber Tower</span>
+            <strong id="absorberStatus">Active</strong>
+        </div>
+
+        <div class="process-row">
+            <span><span class="process-dot green-dot"></span> Stripper Unit</span>
+            <strong id="stripperStatus">Active</strong>
+        </div>
+
+        <div class="process-row">
+            <span><span id="reboilerDot" class="process-dot yellow-dot"></span> Reboiler</span>
+            <strong id="reboilerStatus">ON</strong>
+        </div>
+
+        <div class="process-row">
+            <span><span class="process-dot green-dot"></span> CO₂ Storage</span>
+            <strong id="storageStatus">Normal</strong>
+        </div>
+
+        <div class="process-row">
+            <span><span class="process-dot green-dot"></span> Exhaust Fan</span>
+            <strong id="fanStatus">-- %</strong>
+        </div>
+
+    </div>
+
+    <div class="bottom-card recommendation-card">
+
+        <div class="chart-title">AI RECOMMENDATION</div>
+
+        <div id="bottomRecommendation" class="bottom-recommendation">
+            Maintain current operation.
+            <br><br>
+            Monitor absorber efficiency.
+        </div>
+
+        <div id="bottomAlert" class="bottom-alert">
+            <i class="fa-solid fa-check"></i> NORMAL OPERATION
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+<!-- END PAGE: DASHBOARD -->
+
+
+<!-- ================= OTHER PAGES (placeholders) ================= -->
+
+<div id="page-analytics" class="page">
+    <div id="analyticsRoot" class="analytics-wrap"></div>
+</div>
+
+<div id="page-alerts" class="page">
+    <div id="alertsRoot" class="analytics-wrap"></div>
+</div>
+
+<div id="page-model" class="page">
+    <div id="modelRoot" class="analytics-wrap"></div>
+</div>
+
+<div id="page-control" class="page">
+    <div id="controlRoot" class="analytics-wrap"></div>
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+    <div>ESP32 Status: <span id="esp" class="footer-green">Simulation</span></div>
+
+    <div>Backend: <span class="footer-blue">Flask API</span></div>
+
+    <div>Model: <span class="footer-blue">carbon_capture_model.tflite</span></div>
+
+    <div>Update Interval: <span class="footer-green">2s</span></div>
+
+    <div>
+        <span class="footer-dot"></span>
+        Digital Twin: <span class="footer-green">Active</span>
+    </div>
+
+</footer>
+
+
+<!-- ================= LIBRARIES ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script src="./script.js"></script>
+<script src="./analytics.js"></script>
+<script src="./alerts.js"></script>
+<script src="./model.js"></script>
+<script src="./control.js"></script>
+<script type="module" src="./three.js"></script>
+
+</body>
+</html>
