@@ -16,7 +16,8 @@ CORS(app)
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "icml")
+FRONTEND_DIR = BASE_DIR
+
 
 # database lives in your user folder, outside the project,
 # so Live Server never sees it change (this stops the page reloading)
